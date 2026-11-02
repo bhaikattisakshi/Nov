@@ -1,0 +1,59 @@
+
+def get_next_states(state):
+    x, y = state
+    next_states = []
+
+    # 1. Fill Jug A
+    next_states.append(((4, y), "Fill Jug A"))
+
+    # 2. Fill Jug B
+    next_states.append(((x, 3), "Fill Jug B"))
+
+    # 3. Empty Jug A
+    next_states.append(((0, y), "Empty Jug A"))
+
+    # 4. Empty Jug B
+    next_states.append(((x, 0), "Empty Jug B"))
+
+    # 5. Pour Jug A into Jug B
+    transfer = min(x, 3 - y)
+    next_states.append(((x - transfer, y + transfer),
+                        "Pour A to B"))
+
+    # 6. Pour Jug B into Jug A
+    transfer = min(y, 4 - x)
+    next_states.append(((x + transfer, y - transfer),
+                        "Pour B to A"))
+
+    return next_states
+
+
+def dfs_water_jug():
+    initial = (0, 0)
+    goal = [(2, 0), (0, 2)]
+
+    stack = [(initial, [])]
+    visited = {initial}
+
+    while stack:
+        state, path = stack.pop()
+
+        if state in goal:
+            print("Solution Found!")
+            for step, (s, action) in enumerate(path, 1):
+                print(step, action, "->", s)
+            print("Goal State:", state)
+            return
+
+        for next_state, action in get_next_states(state):
+            if next_state not in visited:
+                visited.add(next_state)
+                stack.append(
+                    (next_state, path + [(next_state, action)])
+                )
+
+    print("No solution found!")
+
+
+# Run the program
+dfs_water_jug()

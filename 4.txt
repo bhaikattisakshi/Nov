@@ -1,0 +1,138 @@
+
+import random
+
+# Distance matrix for six cities
+D = [
+    [0, 10, 15, 20, 18, 12],
+    [10, 0, 35, 25, 17, 28],
+    [15, 35, 0, 30, 28, 20],
+    [20, 25, 30, 0, 22, 16],
+    [18, 17, 28, 22, 0, 14],
+    [12, 28, 20, 16, 14, 0]
+]
+
+cities = ['A', 'B', 'C', 'D', 'E', 'F']
+
+
+# Calculate total tour distance
+def tour_cost(tour):
+    total = 0
+
+    for i in range(len(tour)):
+        total += D[tour[i]][tour[(i + 1) % len(tour)]]
+
+    return total
+
+
+# Generate neighbours using 2-opt
+def get_neighbors(tour):
+    neighbors = []
+    n = len(tour)
+
+    for i in range(1, n - 1):
+        for j in range(i + 1, n):
+
+            new_tour = list(tour)
+
+            # Reverse a section of the tour
+            new_tour[i:j + 1] = reversed(
+                new_tour[i:j + 1]
+            )
+
+            neighbors.append(tuple(new_tour))
+
+    return neighbors
+
+
+# Local Beam Search
+def local_beam_search(k, iterations, seed):
+
+    random.seed(seed)
+
+    # Generate k unique initial tours
+    beam = set()
+
+    while len(beam) < k:
+        remaining = list(range(1, 6))
+        random.shuffle(remaining)
+
+        tour = (0, *remaining)
+        beam.add(tour)
+
+    beam = sorted(beam, key=tour_cost)
+
+    global_best = beam[0]
+
+    print("\nBeam Width:", k)
+    print("Seed:", seed)
+
+    # Search iterations
+    for iteration in range(1, iterations + 1):
+
+        successors = set()
+
+        # Generate neighbours of all beam tours
+        for tour in beam:
+            successors.update(get_neighbors(tour))
+
+        # Remove duplicates and sort by cost
+        successors = sorted(
+            successors,
+            key=tour_cost
+        )
+
+        # Select best k successors
+        beam = successors[:k]
+
+        # Update global best
+        if tour_cost(beam[0]) < tour_cost(global_best):
+            global_best = beam[0]
+
+        print(
+            "Iteration:", iteration,
+            "| Current Best:", tour_cost(beam[0]),
+            "| Global Best:", tour_cost(global_best)
+        )
+
+    return global_best, tour_cost(global_best)
+
+
+# Main program
+if __name__ == "__main__":
+
+    k = 4
+    iterations = 10
+
+    best_tour, best_cost = local_beam_search(
+        k, iterations, seed=1
+    )
+
+    print("\nFinal Best Tour:")
+
+    route = [cities[i] for i in best_tour]
+    route.append(route[0])
+
+    print(" -> ".join(route))
+    print("Minimum Distance:", best_cost)
+
+    # Compare different random seeds
+    print("\nComparison of Random Seeds:")
+
+    results = []
+
+    for seed in [1, 2, 3]:
+
+        tour, distance = local_beam_search(
+            k, iterations, seed
+        )
+
+        results.append(distance)
+
+        print(
+            "Seed:", seed,
+            "Best Cost:", distance
+        )
+
+    print("\nBest Cost:", min(results))
+    print("Average Cost:", sum(results) / len(results))
+

@@ -1,0 +1,35 @@
+
+def chatbot():
+    print("Chatbot: Hello! Welcome to Simple AI Chatbot.")
+    print("Type 'bye' to exit the chatbot.")
+
+    while True:
+        user_input = input("You: ").lower()
+
+        if any(word in user_input for word in ["bye", "exit", "quit"]):
+            print("Chatbot: Goodbye! Have a nice day.")
+            break
+
+        elif any(word in user_input for word in ["hello", "hi", "hey"]):
+            print("Chatbot: Hello! How can I help you?")
+
+        elif "name" in user_input:
+            print("Chatbot: I am a simple AI chatbot.")
+
+        elif "how are you" in user_input:
+            print("Chatbot: I am fine. Thank you for asking!")
+
+        elif any(word in user_input for word in ["course", "subject"]):
+            print("Chatbot: I can provide basic information about your course.")
+
+        elif "help" in user_input:
+            print("Chatbot: Sure! You can ask me about my name, course, or general information.")
+
+        elif any(word in user_input for word in ["thank", "thanks"]):
+            print("Chatbot: You are welcome!")
+
+        else:
+            print("Chatbot: Sorry, I do not understand your question.")
+
+
+chatbot()
